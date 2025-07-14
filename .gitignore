@@ -14,3 +14,34 @@ _book
 *.epub
 *.mobi
 *.pdf
+# Python
+__pycache__/
+*.pyc
+*.pyd
+*.so
+.Python
+build/
+dist/
+develop-eggs/
+*.egg-info/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg
+.env
+.venv
+venv/
+env/
+# VS Code
+.vscode/
+# Operating System Files
+.DS_Store
+Thumbs.db
+# Logs and other temporary files
+*.log
+*.tmp
+*.swp
