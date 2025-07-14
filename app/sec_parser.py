@@ -31,8 +31,7 @@ def extract_deal_terms(sec_text: str) -> dict:
             deal["confidence_score"] = "Medium"
             deal["manual_review_flag"] = True # Flag for review if only total is present
 
-    # FIX APPLIED HERE: More robust regex for participation rights (including just percentages)
-    # Also ensure it captures the full phrase if possible, or just the percentage
+    # More robust regex for participation rights (including just percentages)
     rights_match = re.search(r'(royalties\s+of\s+\d+%)|(co-commercialization)|(\d+%)', sec_text, re.IGNORECASE)
     if rights_match:
         # Prioritize full phrase, then co-commercialization, then just percentage
@@ -50,9 +49,8 @@ def extract_deal_terms(sec_text: str) -> dict:
         elif deal["confidence_score"] == "Medium" and not (rights_match.group(1) or rights_match.group(2)):
             deal["manual_review_flag"] = True # Flag if only percentage found, not full phrase
 
-
-    # FIX APPLIED HERE: More robust regex for deal date (including "signed on")
-    date_match = re.search(r'(dated as of|effective as of|entered into on|signed on)\s+(\w+\s+\d{1,2},\s+\d{4})', sec_text, re.IGNORECASE)
+    # FIX APPLIED HERE: More robust regex for deal date (including "Agreement dated")
+    date_match = re.search(r'(dated as of|effective as of|entered into on|signed on|agreement dated)\s+(\w+\s+\d{1,2},\s+\d{4})', sec_text, re.IGNORECASE)
     if date_match:
         deal["deal_date"] = date_match.group(2)
         # If date is found, it adds to confidence, but doesn't override financial confidence
@@ -71,6 +69,5 @@ def extract_deal_terms(sec_text: str) -> dict:
         if deal["confidence_score"] == "High": # If one was found with high, but other not
             deal["confidence_score"] = "Medium"
             deal["manual_review_flag"] = True
-
 
     return deal
