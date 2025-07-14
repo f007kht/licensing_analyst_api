@@ -1,8 +1,11 @@
-openapi: 3.0.0
+openapi: 3.1.0 # CHANGED: Updated OpenAPI version to 3.1.0
 info:
   title: Licensing Deal Profile API
   version: 1.0.0
   description: Fetch and structure data for stage-gated licensing ROI analysis using ClinicalTrials.gov and SEC filing text.
+
+servers: # This block is now explicitly included and populated
+  - url: https://licensing-analyst-api.onrender.com # IMPORTANT: Replace with your actual Render.com URL
 
 paths:
   /assemble_deal_profile:
@@ -18,11 +21,11 @@ paths:
               properties:
                 nct_id:
                   type: string
-                  example: NCT04583969
+                  example: NCT04372602
                 sec_text:
                   type: string
                   example: >
-                    This agreement includes a $100 million upfront payment, up to $230 million in milestones...
+                    This agreement includes a $100 million upfront payment, up to $230 million in milestones, and royalties of 7% plus co-commercialization rights. The deal was dated as of March 3, 2024.
                 sec_url:
                   type: string
                   example: https://www.sec.gov/Archives/edgar/data/0001234567/000123456724000012/ex-10_1.htm
@@ -31,5 +34,31 @@ paths:
           description: Structured licensing deal profile
           content:
             application/json:
+              # CHANGED: Added a more detailed schema for the 200 response body
               schema:
                 type: object
+                properties:
+                  primary_nct_id: {type: string, description: "Primary ClinicalTrials.gov Identifier"}
+                  trial_overall_status: {type: string, nullable: true, description: "Overall recruitment status of the clinical trial"}
+                  trial_completion_date: {type: string, format: date, nullable: true, description: "Date when data collection for all outcomes was completed"}
+                  last_update_post_date: {type: string, format: date, nullable: true, description: "Most recent public update date for the trial record"}
+                  development_stage_at_signing: {type: string, nullable: true, description: "Clinical development phase at the time of deal signing"}
+                  lead_sponsor: {type: string, nullable: true, description: "Name of the lead sponsor of the clinical trial"}
+                  collaborators: {type: array, items: {type: string}, description: "List of collaborating organizations"}
+                  conditions: {type: array, items: {type: string}, description: "List of conditions/diseases studied"}
+                  interventions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type: {type: string, description: "Type of intervention (e.g., DRUG, PROCEDURE)"}
+                        name: {type: string, description: "Name of the intervention"}
+                    description: "List of interventions/treatments in the trial"
+                  upfront_investment_usd: {type: number, format: float, nullable: true, description: "Non-contingent payment made at deal execution in USD"}
+                  total_deal_value_usd: {type: number, format: float, nullable: true, description: "Sum of upfront, milestones, and potential future payments in USD"}
+                  participation_rights: {type: string, nullable: true, description: "Description of royalty, profit-sharing, or co-commercialization terms"}
+                  deal_date: {type: string, format: date, nullable: true, description: "Date the deal was publicly announced"}
+                  cross_source_discrepancies: {type: array, items: {type: string}, description: "List of inconsistencies or issues found across data sources"}
+                  confidence_score: {type: string, description: "Confidence level of the extracted data (High, Medium, Low)"}
+                  manual_review_flag: {type: boolean, description: "Flag indicating if manual human review is required"}
+                  supporting_sources: {type: array, items: {type: string}, description: "List of URLs for supporting data sources"}
